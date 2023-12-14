@@ -1,14 +1,11 @@
 name: aws-iot-sample-deployment
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
     inputs:
       destroy:
         description: "Destroy AWS Lambda"
-        required: true
+        required: false
 
 jobs:
   destroy:

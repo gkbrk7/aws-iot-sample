@@ -37,20 +37,3 @@ jobs:
       - name: Deploy to AWS Lambda
         working-directory: ./src/aws-iot-sample
         run: dotnet lambda deploy-function MyFunction --function-role MyFunction.role --disable-interactive true
-
-  destroy:
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.destroy == 'true'
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-dotnet@v2
-        with:
-          dotnet-version: "6.0.x"
-
-      - name: AWS CLI
-        run: dotnet tool install -g Amazon.Lambda.Tools
-
-      - name: Destroy AWS Lambda
-        working-directory: ./src/aws-iot-sample
-        run: dotnet lambda delete-function MyFunction
