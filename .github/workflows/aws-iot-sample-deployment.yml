@@ -9,6 +9,8 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: aws-lambda-test
+    env:
+      AWS_REGION: ${{ secrets.AWS_REGION }}
 
     steps:
       - uses: actions/checkout@v2
@@ -29,4 +31,4 @@ jobs:
       #   run: dotnet publish --configuration Release --output ./out
 
       - name: Deploy to AWS Lambda
-        run: dotnet lambda deploy-function --region $AWS_REGION
+        run: dotnet lambda deploy-function --disable-interactive
