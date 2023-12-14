@@ -14,21 +14,21 @@ jobs:
       - uses: actions/setup-dotnet@v2
         with:
           dotnet-version: "6.0.x"
+
+      - name: AWS CLI
+        run: dotnet tool install -g Amazon.Lambda.Tools
+
       - name: Build
         run: dotnet build --configuration Release
 
       - name: Run Unit Tests
         run: dotnet test --configuration Release --logger "trx;LogFileName=test_results.trx"
 
-      - name: Publish
-        run: dotnet publish --configuration Release --output ./out
+      # - name: Publish
+      #   run: dotnet publish --configuration Release --output ./out
 
       - name: Deploy to AWS Lambda
-        uses: aws-actions/aws-lambda-dotnet@v6
-        with:
-          function-name: MyFunction
-          handler: aws_iot_sample::MyFunction::FunctionHandler
-          deployment-package: ./out
+        run: dotnet lambda deploy-function
 
         env:
           AWS_REGION: ${{ secrets.AWS_REGION }}

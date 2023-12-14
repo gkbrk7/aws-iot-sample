@@ -5,12 +5,12 @@
     "dotnet lambda help",
     "All the command line options for the Lambda command can be specified in this file."
   ],
-  "profile": "",
-  "region": "",
+  "profile": "default",
+  "region": "eu-central-1",
   "configuration": "Release",
   "function-architecture": "x86_64",
   "function-runtime": "dotnet6",
   "function-memory-size": 256,
   "function-timeout": 30,
-  "function-handler": "aws-iot-sample::aws_iot_sample.Function::FunctionHandler"
+  "function-handler": "aws-iot-sample::aws_iot_sample.MyFunction::FunctionHandler"
 }
