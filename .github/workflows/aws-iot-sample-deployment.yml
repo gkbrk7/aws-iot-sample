@@ -4,9 +4,14 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      destroy:
+        description: "Destroy resources"
+        required: false
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     environment: aws-lambda-test
     env:
@@ -27,9 +32,21 @@ jobs:
       - name: Run Unit Tests
         run: dotnet test --configuration Release --logger "trx;LogFileName=test_results.trx"
 
-      # - name: Publish
-      #   run: dotnet publish --configuration Release --output ./out
+  deploy:
+    needs: [build]
+    runs-on: ubuntu-latest
 
+    steps:
       - name: Deploy to AWS Lambda
         working-directory: ./src/aws-iot-sample
-        run: dotnet lambda deploy-function --disable-interactive true
+        run: dotnet lambda deploy-function --function-name MyFunction --function-role MyFunction.role --disable-interactive true
+
+  destroy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Destroy AWS Lambda
+        working-directory: ./src/aws-iot-sample
+        run: dotnet lambda delete-function MyFunction
