@@ -33,4 +33,4 @@ jobs:
       #   run: dotnet publish --configuration Release --output ./out
 
       - name: Deploy to AWS Lambda
-        run: dotnet lambda deploy-function --region $AWS_REGION
+        run: dotnet lambda deploy-function --region ${{ secrets.AWS_REGION }}
