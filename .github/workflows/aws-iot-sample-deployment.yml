@@ -23,6 +23,13 @@ jobs:
         with:
           dotnet-version: "6.0.x"
 
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION}}
+
       - name: AWS CLI
         run: dotnet tool install -g Amazon.Lambda.Tools
 
@@ -34,7 +41,7 @@ jobs:
 
       - name: Deploy to AWS Lambda
         working-directory: ./src/aws-iot-sample
-        run: dotnet lambda deploy-function --function-name MyFunction --function-role MyFunction.role --disable-interactive true
+        run: dotnet lambda deploy-function MyFunction --function-role MyFunction.role --disable-interactive true
 
   destroy:
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.destroy == 'true'
