@@ -31,4 +31,5 @@ jobs:
       #   run: dotnet publish --configuration Release --output ./out
 
       - name: Deploy to AWS Lambda
+        working-directory: ./src/aws-iot-sample
         run: dotnet lambda deploy-function --disable-interactive true
