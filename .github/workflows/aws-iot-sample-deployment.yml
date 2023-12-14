@@ -1,0 +1,36 @@
+name: aws-iot-sample-deployment
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: "6.0.x"
+      - name: Build
+        run: dotnet build --configuration Release
+
+      - name: Run Unit Tests
+        run: dotnet test --configuration Release --logger "trx;LogFileName=test_results.trx"
+
+      - name: Publish
+        run: dotnet publish --configuration Release --output ./out
+
+      - name: Deploy to AWS Lambda
+        uses: aws-actions/aws-lambda-dotnet@v6
+        with:
+          function-name: MyFunction
+          handler: aws_iot_sample::MyFunction::FunctionHandler
+          deployment-package: ./out
+
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

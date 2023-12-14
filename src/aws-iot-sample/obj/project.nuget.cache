@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "BbV8j8UXdnyMv5QqFYc52hDu7k7Jng2/np5wiYh5Hs94kchpmdGAtymYuDqNXM3Q6hKKOGwwyoJR8LNtPJNorA==",
+  "success": true,
+  "projectFilePath": "/Users/gokberkyildirim/Desktop/aws-iot-sample/src/aws-iot-sample/aws-iot-sample.csproj",
+  "expectedPackageFiles": [
+    "/Users/gokberkyildirim/.nuget/packages/amazon.lambda.core/2.2.0/amazon.lambda.core.2.2.0.nupkg.sha512",
+    "/Users/gokberkyildirim/.nuget/packages/amazon.lambda.serialization.systemtextjson/2.4.0/amazon.lambda.serialization.systemtextjson.2.4.0.nupkg.sha512",
+    "/Users/gokberkyildirim/.nuget/packages/microsoft.netcore.app.crossgen2.osx-arm64/6.0.25/microsoft.netcore.app.crossgen2.osx-arm64.6.0.25.nupkg.sha512"
+  ],
+  "logs": []
+}
