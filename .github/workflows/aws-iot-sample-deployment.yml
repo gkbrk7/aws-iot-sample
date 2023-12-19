@@ -34,6 +34,10 @@ jobs:
       - name: Run Unit Tests
         run: dotnet test --configuration Release --logger "trx;LogFileName=test_results.trx"
 
-      - name: Deploy to AWS Lambda
-        working-directory: ./src/aws-iot-sample
-        run: dotnet lambda deploy-function MyFunction --function-role MyFunction.role --disable-interactive true
+      - name: Deploy to HandheldAlertHandler
+        working-directory: ./src/HandheldAlertHandler
+        run: dotnet lambda deploy-function HandheldAlertHandler --function-role HandheldAlertHandler.role --disable-interactive true
+
+      - name: Deploy to VehicleLocationWriter
+        working-directory: ./src/VehicleLocationWriter
+        run: dotnet lambda deploy-function VehicleLocationWriter --function-role VehicleLocationWriter.role --disable-interactive true

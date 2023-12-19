@@ -1,4 +1,4 @@
-name: aws-iot-sample-deployment
+name: aws-iot-sample-destroy
 
 on:
   workflow_dispatch:
@@ -31,3 +31,11 @@ jobs:
       - name: Destroy AWS Lambda
         working-directory: ./src/aws-iot-sample
         run: dotnet lambda delete-function MyFunction
+
+      - name: Destroy HandheldAlertHandler
+        working-directory: ./src/HandheldAlertHandler
+        run: dotnet lambda delete-function HandheldAlertHandler
+
+      - name: Destroy VehicleLocationWriter
+        working-directory: ./src/VehicleLocationWriter
+        run: dotnet lambda delete-function VehicleLocationWriter
