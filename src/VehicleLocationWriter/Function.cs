@@ -1,5 +1,6 @@
 using Amazon.Lambda.Core;
 using SampleIoTApp.Application.Commands;
+using SampleIoTApp.Application.Utilities;
 using SampleIoTApp.Domain;
 using SampleIoTApp.VehicleLocationWriter;
 
@@ -7,7 +8,7 @@ namespace SampleIoTApp.Functions.VehicleLocationWriter;
 
 public class Function : Startup
 {
-    public async Task<string> FunctionHandler(VehicleLocation vehicleLocation, ILambdaContext context)
+    public async Task<ApiResponse> FunctionHandler(VehicleLocation vehicleLocation, ILambdaContext context)
     {
         var command = new VehicleLocationCommand
         {
