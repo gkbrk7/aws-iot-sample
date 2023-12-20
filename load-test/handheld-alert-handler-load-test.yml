@@ -1,0 +1,13 @@
+config:
+  target: "{{ $processEnvironment.HANDHELD_ALERT_HANDLER_URL }}"
+  http:
+    timeout: 60
+  phases:
+    - duration: 600
+      arrivalRate: 100
+
+scenarios:
+  - name: "List buckets"
+    flow:
+      - get:
+          url: "/"

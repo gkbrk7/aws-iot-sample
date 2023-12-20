@@ -1,0 +1,13 @@
+config:
+  target: "{{ $processEnvironment.VEHICLE_LOCATION_WRITER_URL }}"
+  http:
+    timeout: 60
+  phases:
+    - duration: 600
+      arrivalRate: 100
+
+scenarios:
+  - name: "Test Request"
+    flow:
+      - get:
+          url: "/"
