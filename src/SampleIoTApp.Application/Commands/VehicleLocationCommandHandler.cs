@@ -5,30 +5,32 @@ using System.Threading.Tasks;
 using Amazon.Runtime.Internal;
 using MediatR;
 using SampleIoTApp.Application.Interfaces;
+using SampleIoTApp.Application.Services;
+using SampleIoTApp.Application.Utilities;
 using SampleIoTApp.Domain;
 
 namespace SampleIoTApp.Application.Commands
 {
-    public class VehicleLocationCommand : IRequest<string>
+    public class VehicleLocationCommand : IRequest<ApiResponse>
     {
         public string? VehicleId { get; set; }
         public double Latitude { get; set; }
         public double Longitude { get; set; }
         public DateTime Timestamp { get; set; }
     }
-    public class VehicleLocationCommandHandler : IRequestHandler<VehicleLocationCommand, string>
+    public class VehicleLocationCommandHandler : IRequestHandler<VehicleLocationCommand, ApiResponse>
     {
         private readonly IVehicleLocationRepository _vehicleLocationRepository;
-        private readonly IMediator _mediator;
-        public VehicleLocationCommandHandler(IVehicleLocationRepository vehicleLocationRepository, IMediator mediator)
+        private readonly ILoggerService _loggerService;
+        public VehicleLocationCommandHandler(IVehicleLocationRepository vehicleLocationRepository, ILoggerService loggerService)
         {
             this._vehicleLocationRepository = vehicleLocationRepository;
-            this._mediator = mediator;
+            this._loggerService = loggerService;
         }
-        public async Task<string> Handle(VehicleLocationCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponse> Handle(VehicleLocationCommand request, CancellationToken cancellationToken)
         {
-            if (request.VehicleId is null)
-                return Guid.NewGuid().ToString();
+            if (string.IsNullOrEmpty(request.VehicleId))
+                return new ApiResponse(false, "VehicleId Not Found!");
 
             var vehicleLocation = new VehicleLocation
             {
@@ -39,7 +41,7 @@ namespace SampleIoTApp.Application.Commands
             };
 
             await _vehicleLocationRepository.Save(vehicleLocation);
-            return Guid.NewGuid().ToString();
+            return new ApiResponse(true, "Vehicle Location Successfully Added.");
         }
     }
 }

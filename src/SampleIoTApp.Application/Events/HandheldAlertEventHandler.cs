@@ -37,7 +37,7 @@ namespace SampleIoTApp.Application.Events
         public async Task Handle(HandheldAlertEvent notification, CancellationToken cancellationToken)
         {
             var topic = await _notificationService.FindTopicAsync(notification.AlertTopic);
-            if (topic.TopicArn is null)
+            if (topic is null)
                 return;
 
             var publishRequest = new PublishRequest
