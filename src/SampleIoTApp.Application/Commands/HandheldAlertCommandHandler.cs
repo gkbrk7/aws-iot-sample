@@ -30,7 +30,7 @@ namespace SampleIoTApp.Application.Handlers
             this._mediator = mediator;
             this._vehicleRepository = vehicleRepository;
             this._vehicleHandheldPairRepository = vehicleHandheldPairRepository;
-            this.MAX_TIME_DIFFERENCE_THRESHOLD = double.TryParse(Environment.GetEnvironmentVariable("MAX_TIME_DIFFERENCE_THRESHOLD"), out MAX_TIME_DIFFERENCE_THRESHOLD) ? MAX_TIME_DIFFERENCE_THRESHOLD == 0 ? 30.0 : MAX_TIME_DIFFERENCE_THRESHOLD : MAX_TIME_DIFFERENCE_THRESHOLD;
+            this.MAX_TIME_DIFFERENCE_THRESHOLD = double.TryParse(Environment.GetEnvironmentVariable("MAX_TIME_DIFFERENCE_THRESHOLD"), out MAX_TIME_DIFFERENCE_THRESHOLD) ? MAX_TIME_DIFFERENCE_THRESHOLD == 0 ? 30.0 : MAX_TIME_DIFFERENCE_THRESHOLD : 30.0;
             this.SNS_ALERT_TOPIC_NAME = Environment.GetEnvironmentVariable("SNS_ALERT_TOPIC_NAME") ?? "50mApartDeliveryTopic";
         }
         public async Task<ApiResponse> Handle(HandheldAlertCommand handheldLocation, CancellationToken cancellationToken)
@@ -53,8 +53,8 @@ namespace SampleIoTApp.Application.Handlers
 
             if (vehicleLocation is null)
             {
-                this._loggerService.LogInfo("Vehicle Pair Not Found!");
-                return new ApiResponse(false, "Vehicle Pair Not Found!");
+                this._loggerService.LogInfo("Vehicle Location Not Found!");
+                return new ApiResponse(false, "Vehicle Location Not Found!");
             }
 
             var timeDiff = vehicleLocation.Timestamp.GetTimeDifferenceInSeconds(handheldLocation.Timestamp);
