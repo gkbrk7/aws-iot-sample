@@ -4,6 +4,12 @@ public static class DistanceUtilities
     private const double EARTH_RADIUS = 6371000;
     public static double CalculateHaversineDistanceInMeters(double lat1, double lon1, double lat2, double lon2)
     {
+        if (lon1 > 180 || lon1 < -180 || lon2 > 180 || lon1 < -180)
+            return 0;
+
+        if (lat1 > 90 || lat1 < -90 || lat2 > 90 || lat2 < -90)
+            return 0;
+
         lat1 = DegreesToRadians(lat1); lon1 = DegreesToRadians(lon1);
         lat2 = DegreesToRadians(lat2); lon2 = DegreesToRadians(lon2);
 
