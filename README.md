@@ -113,3 +113,14 @@ aws dynamodb delete-table \
   "handheldId": "HH:BB:BB:BB:01"
 }
 ```
+
+```
+sam build
+sam deploy --guided
+sam delete --stack-name aws-iot-sample-stack
+```
+
+```
+sam local invoke HandheldAlertHandlerFunction -e events/handheld-location-event.json --env-vars events/env.json --force-image-build
+sam local invoke VehicleLocationWriterFunction  -e events/handheld-location-event.json --env-vars events/env.json --force-image-build
+```
