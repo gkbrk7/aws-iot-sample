@@ -158,7 +158,7 @@ namespace HandheldAlertHandler.Tests.Commands
 
             this._vehicleHandheldPairRepository
                 .Setup(vh => vh.Get(It.IsAny<string>()))
-                .Returns(Task.FromResult<VehicleHandheldPair>(null));
+                .Returns(Task.FromResult<VehicleHandheldPair>(null!));
 
             var handheldAlertCommandHandler = new HandheldAlertCommandHandler(this._vehicleLocationRepo.Object, _vehicleHandheldPairRepository.Object, _mediator.Object, _loggerService.Object);
 
@@ -199,7 +199,7 @@ namespace HandheldAlertHandler.Tests.Commands
 
             this._vehicleLocationRepo
                 .Setup(v => v.Get(It.IsAny<string>()))
-                .Returns(Task.FromResult<VehicleLocation>(null));
+                .Returns(Task.FromResult<VehicleLocation>(null!));
 
             var handheldAlertCommandHandler = new HandheldAlertCommandHandler(this._vehicleLocationRepo.Object, _vehicleHandheldPairRepository.Object, _mediator.Object, _loggerService.Object);
 

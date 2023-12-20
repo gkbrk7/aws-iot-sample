@@ -31,7 +31,7 @@ namespace HandheldAlertHandler.Tests.Events
 
             var topic = this._amazonSimpleNotificationService
                 .Setup(s => s.FindTopicAsync(handheldAlertEvent.AlertTopic))
-                .Returns(Task.FromResult<Topic>(null));
+                .Returns(Task.FromResult<Topic>(null!));
 
             var handheldAlertEventHandler = new HandheldAlertEventHandler(_amazonSimpleNotificationService.Object);
 
