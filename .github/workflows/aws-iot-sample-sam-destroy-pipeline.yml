@@ -1,0 +1,47 @@
+name: aws-iot-sample-sam-destroy
+
+on:
+  workflow_dispatch:
+    inputs:
+      destroy:
+        description: "Delete aws-iot-sample-stack"
+        required: false
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  ARTIFACTS_BUCKET: ${{ secrets.ARTIFACTS_BUCKET }}
+  SAM_TEMPLATE: template.yml
+  STACK_NAME: aws-iot-sample-stack
+  # PROD_PIPELINE_EXECUTION_ROLE:
+  # PROD_CLOUDFORMATION_EXECUTION_ROLE:
+
+jobs:
+  destroy:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: aws-lambda-test
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: aws-actions/setup-sam@v2
+        with:
+          use-installer: true
+      - uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: "6.0.x"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION}}
+
+      - name: Delete aws-iot-sample stack
+        run: |
+          sam delete \
+            --stack-name ${STACK_NAME} \
+            --region ${AWS_REGION} \
+            --no-prompts
