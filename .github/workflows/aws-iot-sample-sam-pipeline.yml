@@ -31,6 +31,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     needs: [test]
     runs-on: ubuntu-latest
+    environment: aws-lambda-test
     steps:
       - uses: actions/checkout@v3
       - uses: aws-actions/setup-sam@v2
@@ -64,6 +65,7 @@ jobs:
 
   deploy:
     if: github.ref == 'refs/heads/main'
+    needs: [build-package]
     runs-on: ubuntu-latest
     environment: aws-lambda-test
 
