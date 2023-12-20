@@ -1,9 +1,14 @@
 name: aws-iot-sample-deployment
 
 on:
-  push:
-    branches:
-      - main
+  # push:
+  #   branches:
+  #     - main
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: "Deploy AWS Lambda"
+        required: false
 
 jobs:
   deploy:

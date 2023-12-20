@@ -1,0 +1,122 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Sample SAM Template for aws-iot-sample
+
+Globals:
+  Function:
+    Timeout: 30
+    Runtime: dotnet6
+    Architectures:
+      - arm64
+    MemorySize: 256
+    Tracing: Active
+    # Environment:
+    #   Variables:
+    #     PRODUCT_TABLE_NAME: !Ref Table
+
+Resources:
+  # CommonDependencyLayers:
+  #   Type: AWS::Serverless::LayerVersion
+  #   Properties:
+  #     ContentUri: ./src/SampleIoTApp.Shared
+  #     CompatibleRuntimes:
+  #       - dotnet6
+  #     CompatibleArchitectures:
+  #       - arm64
+  #     RetentionPolicy: Retain
+  #   Metadata:
+  #     BuildMethod: dotnet6
+  #     BuildArchitecture: arm64
+
+  HandheldAlertHandlerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: HandheldAlertHandler::SampleIoTApp.Functions.HandheldAlertHandler.Function::FunctionHandler
+      CodeUri: ./src/HandheldAlertHandler
+      Environment:
+        Variables:
+          SNS_ALERT_TOPIC_NAME: !GetAtt 50mApartDeliveryTopic.TopicName
+          MAX_TIME_DIFFERENCE_THRESHOLD: 30.0
+      Events:
+        HandheldAlertHandlerEvent:
+          Type: IoTRule
+          Properties:
+            AwsIotSqlVersion: "2016-03-23"
+            Sql: SELECT * FROM 'v1/gps/handheld/#'
+      # Layers:
+      #   - !Ref CommonDependencyLayers
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - sns:ListTopics
+                - sns:Publish
+              Resource: "*"
+        - DynamoDBReadPolicy:
+            TableName: !Ref VehicleLocationTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref Vehicle2HandheldTable
+
+  VehicleLocationWriterFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: VehicleLocationWriter::SampleIoTApp.Functions.VehicleLocationWriter.Function::FunctionHandler
+      CodeUri: ./src/VehicleLocationWriter
+      Events:
+        VehicleLocationWriterEvent:
+          Type: IoTRule
+          Properties:
+            AwsIotSqlVersion: "2016-03-23"
+            Sql: SELECT * FROM 'v1/gps/vehicle/#'
+      # Layers:
+      #   - !Ref CommonDependencyLayers
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref VehicleLocationTable
+        - DynamoDBWritePolicy:
+            TableName: !Ref VehicleLocationTable
+
+  50mApartDeliveryTopic:
+    Type: AWS::SNS::Topic
+
+  VehicleLocationTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: VehicleLocationTable
+      AttributeDefinitions:
+        - AttributeName: vehicleId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: vehicleId
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+  Vehicle2HandheldTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Vehicle2HandheldTable
+      AttributeDefinitions:
+        - AttributeName: handheldMacAddress
+          AttributeType: S
+        - AttributeName: vehicleMacAddress
+          AttributeType: S
+      KeySchema:
+        - AttributeName: handheldMacAddress
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      GlobalSecondaryIndexes:
+        - IndexName: VehicleMacAddressIndex
+          KeySchema:
+            - AttributeName: vehicleMacAddress
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+          ProvisionedThroughput:
+            ReadCapacityUnits: 5
+            WriteCapacityUnits: 5
