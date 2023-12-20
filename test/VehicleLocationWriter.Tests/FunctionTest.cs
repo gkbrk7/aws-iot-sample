@@ -1,28 +1,23 @@
 using Xunit;
-using Amazon.Lambda.Core;
-using Amazon.Lambda.TestUtilities;
-using SampleIoTApp.Functions.VehicleLocationWriter;
 using SampleIoTApp.Application.Interfaces;
 using Moq;
-using MediatR;
-using SampleIoTApp.Application.Handlers;
 using SampleIoTApp.Domain;
 using FluentAssertions;
 using SampleIoTApp.Application.Commands;
+using SampleIoTApp.Application.Services;
+using SampleIoTApp.Application.Utilities;
 
 namespace VehicleLocationWriter.Tests;
 
 public class FunctionTest
 {
-    private readonly Mock<IVehicleHandheldPairRepository> mockDynamoVehicleHandheldPairRepo;
     private readonly Mock<IVehicleLocationRepository> mockDynamoVehicleLocationRepo;
-    private readonly Mock<IMediator> mockMediator;
+    private readonly Mock<ILoggerService> mockLoggerService;
 
     public FunctionTest()
     {
-        this.mockDynamoVehicleHandheldPairRepo = new();
         this.mockDynamoVehicleLocationRepo = new();
-        this.mockMediator = new();
+        this.mockLoggerService = new();
     }
 
     [Fact]
@@ -35,6 +30,39 @@ public class FunctionTest
             Longitude = 5.693921,
             Timestamp = DateTime.Parse("2022-10-10T16:45:39Z"),
             VehicleId = "VV:AA:AA:AA:01"
+        };
+
+
+        var vehicleLocation = new VehicleLocation
+        {
+            Latitude = 53.236545,
+            Longitude = 5.693435,
+            Timestamp = DateTime.Parse("2022-10-10T16:45:39Z"),
+            VehicleId = "VV:AA:AA:AA:01"
+        };
+
+        mockDynamoVehicleLocationRepo.Setup(v => v.Save(It.IsAny<VehicleLocation>())).Verifiable();
+
+        var vehicleLocationCommandHandler = new VehicleLocationCommandHandler(mockDynamoVehicleLocationRepo.Object, mockLoggerService.Object);
+
+        // Act
+        var response = await vehicleLocationCommandHandler.Handle(handheldAlertCommand, CancellationToken.None);
+
+        // Assert
+        response.Success.Should().BeTrue();
+        response.Should().BeOfType<ApiResponse>();
+    }
+
+    [Fact]
+    public async void ShouldReturnFalseForEmptyVehicleId()
+    {
+        // Arrange
+        var handheldAlertCommand = new VehicleLocationCommand
+        {
+            Latitude = 53.236545,
+            Longitude = 5.693921,
+            Timestamp = DateTime.Parse("2022-10-10T16:45:39Z"),
+            VehicleId = ""
         };
 
         var vehicleHandheldPair = new VehicleHandheldPair
@@ -51,15 +79,16 @@ public class FunctionTest
             VehicleId = "VV:AA:AA:AA:01"
         };
 
-        mockDynamoVehicleHandheldPairRepo.Setup(p => p.Get(It.IsAny<string>())).ReturnsAsync(vehicleHandheldPair);
-        mockDynamoVehicleLocationRepo.Setup(v => v.Get(It.IsAny<string>())).ReturnsAsync(vehicleLocation);
+        mockDynamoVehicleLocationRepo.Setup(v => v.Save(It.IsAny<VehicleLocation>())).Verifiable();
 
-        var vehicleLocationCommandHandler = new VehicleLocationCommandHandler(mockDynamoVehicleLocationRepo.Object, mockMediator.Object);
+        var vehicleLocationCommandHandler = new VehicleLocationCommandHandler(mockDynamoVehicleLocationRepo.Object, mockLoggerService.Object);
 
         // Act
         var response = await vehicleLocationCommandHandler.Handle(handheldAlertCommand, CancellationToken.None);
 
         // Assert
-        response.Should().NotBeEmpty();
+        response.Success.Should().BeFalse();
+        response.Should().BeOfType<ApiResponse>();
+        response.Message.Should().Be("VehicleId Not Found!");
     }
 }
