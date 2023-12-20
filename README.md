@@ -1,6 +1,47 @@
 # aws-iot-sample
 
-A sample architecture and solution for iot devices
+This repository contains a solution for one of the problem in IoT devices. It explains how to connect AWS resources such as IoT core via rules and filters, standalone lambda functions, dynamo database and simple notification service together.
+
+## AWS Architecture
+
+![AWS Architecture](assets/architecture.png)
+
+This architecture is designed for detecting proximity between device location and handheld device location by evaluating their gps signals coming through IoT Core. Two different lambda functions are put into the middle of this architecture to perform write/read to dynamodb and proximity calculation. All the read and write operations are separated out each other to make sure consistency and fault-tolerance.
+
+Each component's duty is expressed below in detail:
+
+- **_HandheldAlertHandler (a.k.a HandheldHandler)_**
+
+  - Performs two read operation and proximity check based on incoming message. It checks its pair in dynamodb and tried to fetch pair's last location from another table in dynamodb. After, it calculates the distance between device locations and total time difference for considering 30 seconds time gap maximum by default (**_it is configurable via environment variable_**). In the calculation of proximity, haversine formula is used as a practice and it gives enough precision for the calculation on Earth's surface. If the distance between devices exceed the certain threshold then system will notify SNS service with suitable payload.
+
+- **_VehicleLocationWriter (a.k.a VehicleHandler)_**
+
+  - Only writes/updates the location of vehicles to dynamodb to be pulled back by other lambda function for proximity analysis.
+
+- **_Other resources_**
+
+  - Cloudwatch and XRay are integrated for monitoring, logging and alerting.
+  - Dynamodb stores vehicle's last location and vehicle-handheld device pairs. Necessary indexes are supported.
+  - SAM (Serverless Application Model) is used for the build, deployment, policies and permissions for resources.
+  - Necessary cloudformation template is provisioned under the repository to be able to translate sam instructions to cloudformation.
+
+## Deployment
+
+Make sure aws cli is installed on local machine and configure it to access AWS resources on cloud. `aws configure` can be used for initial configuration.
+
+### Via SAM CLI
+
+In order to deploy resources, first of all, `sam build` command needs to be executed and later `sam deploy --guided` should be run. If the deployment is already done before, `sam deploy` is enough to run to use preconfigured settings.
+
+### Via Dotnet CLI
+
+`dotnet build` and `dotnet lambda deploy-function` commands can be used for this purpose. All the possible commands are presented in github workflows.
+
+### Via CI/CD Pipeline
+
+GitHub actions pipeline is integrated with sam tool to be able to deploy all the required resources to the AWS cloud.
+
+## Usage/Examples
 
 ```
 aws dynamodb get-item \
